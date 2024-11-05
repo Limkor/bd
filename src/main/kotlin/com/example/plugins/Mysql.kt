@@ -10,7 +10,7 @@ import java.sql.Statement
 object MySQLDatabaseExampleKotlin1 {
     private var dataSource: HikariDataSource? = null
     private val username = "root" // укажите имя пользователя
-    private val password = "3620" // укажите соответствующий пароль
+    private val password = "" // укажите соответствующий пароль
 
     init {
         configureHikariCP() // Настраиваем пул соединений при инициализации
