@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Данные о клиентах</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>Таблица с данными о работе</h1>
+<form method="post" action="/exits">
+    <button style="float: right">Вернуться обратно</button>
+</form>
+<form method="post" action="/work">
+    <button type="submit" name="action" value="into" style="float: right">Добавить работу</button>
+</form>
+<table>
+    <thead>
+    <tr>
+        <th>ID_работы</th>
+        <th>Дата начала работы</th>
+        <th>Дата окончания работы</th>
+        <th>Изменения</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="work: ${results}">
+        <form method="post" action="/work">
+            <td th:text="${work.id_work}"></td>
+            <td th:text="${work.start_dt}"></td>
+            <td th:text="${work.end_dt}"></td>
+            <td>
+                <input type="hidden" name="id" th:value="${work.id_work}"/>
+                <button type="submit" name="action" value="del">Удалить</button> <button type="submit" name="action" value="update">Изменить</button>
+                <br><button type="submit" name="action" value="select">Посмотреть</button>
+            </td>
+        </form>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

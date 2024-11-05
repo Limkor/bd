@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Данные о клиентах</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Таблица с данными о оборудовании</h1>
+<form method="post" action="/exits">
+    <button style="float: right">Вернуться обратно</button>
+</form>
+<form method="post" action="/equipment">
+    <button type="submit" name="action" value="into" style="float: right">Добавить оборудование</button>
+</form>
+<table>
+    <thead>
+    <tr>
+        <th>ID_</th>
+        <th>Дата производства</th>
+        <th>Дата окончания эксплуатации</th>
+        <th>Номер модели</th>
+        <th>Изменения</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="equipment: ${results}">
+        <form method="post" action="/equipment">
+            <td th:text="${equipment.id_equipment}"></td>
+            <td th:text="${equipment.purchase_dt}"></td>
+            <td th:text="${equipment.service_life}"></td>
+            <td th:text="${equipment.model_number}"></td>
+            <td>
+                <input type="hidden" name="id" th:value="${equipment.id_equipment}"/>
+                <button type="submit" name="action" value="del">Удалить</button> <button type="submit" name="action" value="update">Изменить</button>
+                <br><button type="submit" name="action" value="select">Посмотреть</button>
+            </td>
+        </form>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

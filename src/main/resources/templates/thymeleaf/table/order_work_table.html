@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Данные о клиентах</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Таблица с данными о заказми и работой</h1>
+
+<form method="post" action="/exits">
+    <button style="float: right">Вернуться обратно</button>
+</form>
+<form method="post" action="/order_work">
+    <button type="submit" name="action" value="into" style="float: right">Добавить работу по заказу</button>
+</form>
+<table>
+    <thead>
+    <tr>
+        <th>Количество товара</th>
+        <th>Статус заказа</th>
+        <th>ID_заказа</th>
+        <th>ID_работы</th>
+        <th>ID_оборудования</th>
+        <th>ID_работника</th>
+        <th>ID_ассортимента</th>
+        <th>Цена за товар</th>
+        <th>ID_цены</th>
+        <th>Изменения</th>
+    </tr>
+    </thead>
+    <tbody>
+    <script>
+        function info() {
+            alert("Вам пиздец!");
+        }
+    </script>
+    <tr th:each="order_work: ${results}">
+        <form method="post" action="/order_work">
+            <td th:text="${order_work.count}"></td>
+            <td th:text="${order_work.orde_status}"></td>
+            <td th:text="${order_work.id_orde}"></td>
+            <td th:text="${order_work.id_work}"></td>
+            <td th:text="${order_work.id_equipment}"></td>
+            <td th:text="${order_work.id_employee}"></td>
+            <td th:text="${order_work.id_assortment}"></td>
+            <td th:text="${order_work.price}"></td>
+            <td th:text="${order_work.id_prese}"></td>
+            <td>
+                <!--<input type="hidden" name="id" th:value="${}"/>-->
+                <button type="submit" name="action" value="del">Удалить</button> <button type="submit" name="action" value="update">Изменить</button>
+                <br><button type="submit" name="action" value="select" onclick="info()">Посмотреть</button>
+            </td>
+        </form>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
