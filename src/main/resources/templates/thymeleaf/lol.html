@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Всплывающее окно</title>
+  <style>
+    /* Стили для кнопки */
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* Стили для фона всплывающего окна */
+    .modal-overlay {
+      display: none; /* Скрыто по умолчанию */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5); /* Прозрачный черный фон */
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Стили для содержимого всплывающего окна */
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Кнопка для закрытия окна */
+    .close-button {
+      background: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Кнопка для открытия окна -->
+<button onclick="openModal()">Открыть окно</button>
+
+<!-- Фон и содержимое всплывающего окна -->
+<div id="modal" class="modal-overlay">
+  <div class="modal-content">
+    <h1>Введите параметры которые хотите изменить</h1>
+    <div>
+      <label for="name">Название:</label>
+      <input type="text" id="name" name="name" placeholder="Название товара">
+    </div>
+    <div>
+      <label for="description">Описание:</label>
+      <input type="text" id="description" name="description" placeholder="Описание товара">
+    </div>
+    <button class="close-button" onclick="closeModal()">Изменить</button>
+  </div>
+</div>
+
+<script>
+  // Функция для открытия окна
+  function openModal() {
+    document.getElementById('modal').style.display = 'flex';
+  }
+
+  // Функция для закрытия окна
+  function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
