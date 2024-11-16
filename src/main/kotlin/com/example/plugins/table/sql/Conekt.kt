@@ -12,7 +12,7 @@ import kotlin.collections.ArrayList
 object MySQLDatabaseExampleKotlin {
     var conn: java.sql.Connection? = null // исправленный тип
     private var username = "root" // укажите имя пользователя
-    private var password = "3620" // укажите соответствующий пароль
+    private var password = "" // укажите соответствующий пароль
     var stmt: Statement? = null
     var resultset: ResultSet? = null
 
