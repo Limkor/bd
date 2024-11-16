@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Данные о клиентах</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        /* Стили для содержимого всплывающего окна */
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Стили для фона всплывающего окна */
+        .modal-overlay {
+            display: none; /* Изначально скрыто */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Показать модальное окно */
+        .modal-overlay.active {
+            display: flex; /* Отображать flex для выравнивания по центру */
+        }
+        .modal-content div {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px; /* Отступ между блоками */
+        }
+
+        .modal-content label {
+            font-weight: bold;
+            margin-bottom: 5px; /* Отступ между текстом метки и полем ввода */
+        }
+
+        .modal-content input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .modal-content output{
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .modal-content select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Таблица с данными о работниках</h1>
+<form method="post" action="/exits_r">
+    <button style="float: right">Вернуться обратно</button>
+</form>
+<button onclick="openModal_into()" type="button" style="float: right">Добавить работника</button>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Фамилия</th>
+        <th>Отчество</th>
+        <th>Номер телефона</th>
+        <th>Изменения</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="emloyee: ${results}">
+        <form method="post" action="/employee">
+            <td th:text="${emloyee.id_employee}"></td>
+            <td th:text="${emloyee.name}"></td>
+            <td th:text="${emloyee.surname}"></td>
+            <td th:text="${emloyee.patronymic}"></td>
+            <td th:text="${emloyee.phone_number}"></td>
+            <td>
+                <input type="hidden" name="id" th:value="${emloyee.id_employee}"/>
+                <button type="submit" name="action" value="del">Удалить</button>
+                <button type="button" th:attr="data-id=${emloyee.id_employee}" onclick="openModal_update(this.dataset.id)">Изменить</button>
+                <br><button
+                    th:attr="data-name=${emloyee.name}, data-surname=${emloyee.surname}, data-patronymic=${emloyee.patronymic}, data-phone=${emloyee.phone_number}"
+                    onclick="openModel_select(this.dataset.name, this.dataset.surname, this.dataset.patronymic, this.dataset.phone)" type="button">
+                Посмотреть
+            </button>
+            </td>
+        </form>
+    </tr>
+    </tbody>
+</table>
+<!-- Единственное модальное окно вне цикла -->
+<div id="modal" class="modal-overlay">
+    <div class="modal-content">
+        <h1>Введите параметры которые хотите изменить</h1>
+        <form method="post" action="/employee">
+            <input type="hidden" id="modal-id" name="id">
+            <div>
+                <label for="name">Имя:</label>
+                <input type="text" id="name" name="name" placeholder="Ваше имя">
+            </div>
+            <div>
+                <label for="surname">Фамилия:</label>
+                <input type="text" id="surname" name="surname" placeholder="Ваша фамилия">
+            </div>
+            <div>
+                <label for="patronymic">Отчество:</label>
+                <input list="options" value="Если хотите поменяить отчество удалите" type="text" id="patronymic" name="patronymic" placeholder="">
+                <datalist id="options">
+                    <option value="Если хотите поменяить отчество удалите">
+                </datalist>
+            </div>
+            <div>
+                <label for="phone">Номер телефона:</label>
+                <input type="text" id="phone" name="phone" placeholder="Ваш номертелефона">
+            </div>
+            <button class="close-button" type="submit" name="action" value="update">Изменить</button>
+            <button type="button" onclick="closeModal_update()">Закрыть</button>
+        </form>
+    </div>
+</div>
+<div id="modal_select" class="modal-overlay">
+    <div class="modal-content">
+        <h1>Данные работника</h1>
+        <div>
+            <label> Имя: </label> <output id="modal-name" name="name"></output>
+            <label> Фамилия: </label> <output id="modal-surname"></output>
+            <label> Отчество: </label> <output id="modal-patronymic"></output>
+            <label> Номер телефона: </label> <output id="modal-phone"></output>
+        </div>
+        <button type="button" onclick="closeModal_select()">Закрыть</button>
+    </div>
+</div>
+<script>
+    function openModel_select(name, surname, patronymic, phone){
+        document.getElementById('modal-name').value = name; // Устанавливаем ID в скрытое поле формы
+        document.getElementById('modal-surname').value = surname;
+        document.getElementById('modal-patronymic').value = patronymic;
+        document.getElementById('modal-phone').value = phone;
+        document.getElementById('modal_select').classList.add('active'); // Показываем модальное окно
+    }
+    function closeModal_select(){
+        document.getElementById('modal_select').classList.remove('active')
+    }
+    // Функция для открытия окна и передачи ID ассортимента
+    function openModal_update(id) {
+        document.getElementById('modal-id').value = id; // Устанавливаем ID в скрытое поле формы
+        document.getElementById('modal').classList.add('active'); // Показываем модальное окно
+    }
+
+    // Функция для закрытия окна
+    function closeModal_update() {
+        document.getElementById('modal').classList.remove('active'); // Скрываем модальное окно
+    }
+    function openModal_into(){
+        document.getElementById('modal_into').classList.add('active')
+    }
+    function closeModal_into(){
+        document.getElementById('modal_into').classList.remove('active')
+    }
+</script>
+
+<div id="modal_into" class="modal-overlay">
+    <div class="modal-content">
+        <h1>Введите данные чтобы добавить запись</h1>
+        <form method="post" action="/employee">
+            <div>
+                <label for="name1">Имя:</label>
+                <input type="text" id="name1" name="name" placeholder="Ваше имя">
+            </div>
+            <div>
+                <label for="surname1">Фамилия:</label>
+                <input type="text" id="surname1" name="surname" placeholder="Ваша фамилия">
+            </div>
+            <div>
+                <label for="patronymic1">Отчество:</label>
+                <input type="text" id="patronymic1" name="patronymic" placeholder="Ваша отчество если есть">
+            </div>
+            <div>
+                <label for="phone1">Номер телефона:</label>
+                <input type="text" id="phone1" name="phone" placeholder="Ваш номертелефона">
+            </div>
+            <button class="close-button" type="submit" name="action" value="into">Добавить</button>
+            <button type="button" onclick="closeModal_into()">Закрыть</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

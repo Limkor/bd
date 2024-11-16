@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Данные о клиентах</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        /* Стили для содержимого всплывающего окна */
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Стили для фона всплывающего окна */
+        .modal-overlay {
+            display: none; /* Изначально скрыто */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Показать модальное окно */
+        .modal-overlay.active {
+            display: flex; /* Отображать flex для выравнивания по центру */
+        }
+        .modal-content div {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px; /* Отступ между блоками */
+        }
+
+        .modal-content label {
+            font-weight: bold;
+            margin-bottom: 5px; /* Отступ между текстом метки и полем ввода */
+        }
+
+        .modal-content input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .modal-content output{
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .modal-content select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Таблица с данными о оборудовании</h1>
+<form method="post" action="/exits_r">
+    <button style="float: right">Вернуться обратно</button>
+</form>
+<button onclick="openModal_into()" type="button" style="float: right">Добавить оборудование</button>
+<table>
+    <thead>
+    <tr>
+        <th>ID_</th>
+        <th>Дата производства</th>
+        <th>Дата окончания эксплуатации</th>
+        <th>Номер модели</th>
+        <th>Изменения</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="equipment: ${results}">
+        <form method="post" action="/equipment">
+            <td th:text="${equipment.id_equipment}"></td>
+            <td th:text="${equipment.purchase_dt}"></td>
+            <td th:text="${equipment.service_life}"></td>
+            <td th:text="${equipment.model_number}"></td>
+            <td>
+                <input type="hidden" name="id" th:value="${equipment.id_equipment}"/>
+                <button type="submit" name="action" value="del">Удалить</button>
+                <button type="button" th:attr="data-id=${equipment.id_equipment}" onclick="openModal_update(this.dataset.id)">Изменить</button>
+                <br><button
+                    th:attr="data-purchase=${equipment.purchase_dt}, data-service=${equipment.service_life}, data-model=${equipment.model_number}"
+                    onclick="openModel_select(this.dataset.purchase, this.dataset.service, this.dataset.model)" type="button">
+                Посмотреть
+            </button>
+            </td>
+        </form>
+    </tr>
+    </tbody>
+</table>
+<!-- Единственное модальное окно вне цикла -->
+<div id="modal" class="modal-overlay">
+    <div class="modal-content">
+        <h1>Введите параметры которые хотите изменить</h1>
+        <form method="post" action="/equipment">
+            <input type="hidden" id="modal-id" name="id">
+            <div>
+                <label for="purchase">Дата изготовления:</label>
+                <input type="text" id="purchase" name="purchase" placeholder="Дата изготовления">
+            </div>
+            <div>
+                <label for="service">Дата окончания срока эксплуатации:</label>
+                <input type="text" id="service" name="service" placeholder="Дата окончания срока эксплуатации">
+            </div>
+            <div>
+                <label for="number">Номер модели:</label>
+                <input type="text" id="number" name="number" placeholder="Номер модели">
+            </div>
+            <button class="close-button" type="submit" name="action" value="update">Изменить</button>
+            <button type="button" onclick="closeModal_update()">Закрыть</button>
+        </form>
+    </div>
+</div>
+<div id="modal_select" class="modal-overlay">
+    <div class="modal-content">
+        <h1>Данные оборудования</h1>
+        <div>
+            <label> Дата производства: </label> <output id="modal-purchase"></output>
+            <label> Дата до срока службы: </label> <output id="modal-service"></output>
+            <label> Номер модели: </label> <output id="modal-model"></output>
+        </div>
+        <button type="button" onclick="closeModal_select()">Закрыть</button>
+    </div>
+</div>
+<script>
+    function openModel_select(purchase, service, model){
+        document.getElementById('modal-purchase').value = purchase; // Устанавливаем ID в скрытое поле формы
+        document.getElementById('modal-service').value = service;
+        document.getElementById('modal-model').value = model;
+        document.getElementById('modal_select').classList.add('active'); // Показываем модальное окно
+    }
+    function closeModal_select(){
+        document.getElementById('modal_select').classList.remove('active')
+    }
+    // Функция для открытия окна и передачи ID ассортимента
+    function openModal_update(id) {
+        document.getElementById('modal-id').value = id; // Устанавливаем ID в скрытое поле формы
+        document.getElementById('modal').classList.add('active'); // Показываем модальное окно
+    }
+
+    // Функция для закрытия окна
+    function closeModal_update() {
+        document.getElementById('modal').classList.remove('active'); // Скрываем модальное окно
+    }
+    function openModal_into(){
+        document.getElementById('modal_into').classList.add('active')
+    }
+    function closeModal_into(){
+        document.getElementById('modal_into').classList.remove('active')
+    }
+</script>
+
+<div id="modal_into" class="modal-overlay">
+    <div class="modal-content">
+        <h1>Введите данные чтобы добавить запись</h1>
+        <form method="post" action="/equipment">
+            <div>
+                <label for="purchase1">Дата изготовления:</label>
+                <input type="text" id="purchase1" name="purchase" placeholder="Дата изготовления">
+            </div>
+            <div>
+                <label for="service1">Дата окончания срока эксплуатации:</label>
+                <input type="text" id="service1" name="service" placeholder="Дата окончания срока эксплуатации">
+            </div>
+            <div>
+                <label for="number1">Номер модели:</label>
+                <input type="text" id="number1" name="number" placeholder="Номер модели">
+            </div>
+            <button class="close-button" type="submit" name="action" value="into">Добавить</button>
+            <button type="button" onclick="closeModal_into()">Закрыть</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

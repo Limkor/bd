@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Данные о клиентах</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        /* Стили для содержимого всплывающего окна */
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Стили для фона всплывающего окна */
+        .modal-overlay {
+            display: none; /* Изначально скрыто */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Показать модальное окно */
+        .modal-overlay.active {
+            display: flex; /* Отображать flex для выравнивания по центру */
+        }
+        .modal-content div {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px; /* Отступ между блоками */
+        }
+
+        .modal-content label {
+            font-weight: bold;
+            margin-bottom: 5px; /* Отступ между текстом метки и полем ввода */
+        }
+
+        .modal-content input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .modal-content output{
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .modal-content select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Таблица с данными о заказми и работой</h1>
+
+<form method="post" action="/exits_c">
+    <button style="float: right">Вернуться обратно</button>
+</form>
+<button onclick="openModal_into()" type="button" style="float: right">Добавить работу по заказу</button>
+<table>
+    <thead>
+    <tr>
+        <th>Количество товара</th>
+        <th>Статус заказа</th>
+        <th>ID_заказа</th>
+        <th>ID_работы</th>
+        <th>ID_оборудования</th>
+        <th>ID_работника</th>
+        <th>ID_ассортимента</th>
+        <th>Цена за товар</th>
+        <th>ID_цены</th>
+        <th>Изменения</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <form method="post" action="/order_work">
+            <th><input type="text" name="count"></th>
+            <th><input type="text" name="status"></th>
+            <th><input type="text" name="id_order"></th>
+            <th><input type="text" name="id_work"></th>
+            <th><input type="text" name="id_equipment"></th>
+            <th><input type="text" name="id_employee"></th>
+            <th><input type="text" name="id_assortment"></th>
+            <th><input type="text" name="price"></th>
+            <th><input type="text" name="id_price"></th>
+            <th><button type="submit" name="action" value="select">Поиск</button></th>
+        </form>
+    </tr>
+    <tr th:each="order_work: ${results}">
+        <form method="post" action="/order_work">
+            <td th:text="${order_work.count}"></td>
+            <td th:text="${order_work.orde_status}"></td>
+            <td th:text="${order_work.id_orde}"></td>
+            <td th:text="${order_work.id_work}"></td>
+            <td th:text="${order_work.id_equipment}"></td>
+            <td th:text="${order_work.id_employee}"></td>
+            <td th:text="${order_work.id_assortment}"></td>
+            <td th:text="${order_work.price}"></td>
+            <td th:text="${order_work.id_prese}"></td>
+            <td>
+                <input type="hidden" name="id_order" th:value="${order_work.id_orde}"/>
+                <input type="hidden" name="id_work" th:value="${order_work.id_work}"/>
+                <input type="hidden" name="id_equipment" th:value="${order_work.id_equipment}"/>
+                <input type="hidden" name="id_employee" th:value="${order_work.id_employee}"/>
+                <input type="hidden" name="id_assortment" th:value="${order_work.id_assortment}"/>
+                <button type="button"
+                             th:attr="data-count=${order_work.count}, data-status=${order_work.orde_status}, data-id_order=${order_work.id_orde}, data-id_work=${order_work.id_work}, data-id_equipment=${order_work.id_equipment}, data-id_employee=${order_work.id_employee}, data-id_assortment=${order_work.id_assortment}, data-price=${order_work.price}, data-prese=${order_work.id_prese}"
+                             onclick="openModal_select(this.dataset.count, this.dataset.status, this.dataset.id_order, this.dataset.id_work, this.dataset.id_equipment, this.dataset.id_employee, this.dataset.id_assortment, this.dataset.price, this.dataset.prese)">
+                Посмотреть
+            </button>
+            </td>
+        </form>
+    </tr>
+    </tbody>
+</table>
+<div id="modal_select" class="modal-overlay">
+    <div class="modal-content">
+        <h1>Даннные работы и заказов</h1>
+        <div>
+            <label> Количество: </label> <output id="modal-count"></output>
+            <label>Статус:</label>  <output id="modal-status"></output>
+            <label>Id заказа:</label>  <output id="modal-id_order1"></output>
+            <label>Id работы:</label>  <output id="modal-id_work1"></output>
+            <label>Id оборудования:</label>  <output id="modal-id_equipment1"></output>
+            <label>Id работника:</label>  <output id="modal-id_employee1"></output>
+            <label>Id ассортимента:</label>  <output id="modal-id_assortment1"></output>
+            <label>Цены:</label>  <output id="modal-price"></output>
+            <label>Id цены:</label> <output id="modal-id_prese"></output>
+        </div>
+        <button type="button" onclick="closeModal_select()">Закрыть</button>
+    </div>
+</div>
+<script>
+    function openModal_select(count, orde_status, id_order, id_work, id_equipment, id_employee, id_assortment, price, id_prese) {
+        document.getElementById('modal-count').value = count;
+        document.getElementById('modal-status').value = orde_status;
+        document.getElementById('modal-id_order1').value = id_order; // Устанавливаем ID в скрытое поле формы
+        document.getElementById('modal-id_work1').value = id_work;
+        document.getElementById('modal-id_equipment1').value = id_equipment;
+        document.getElementById('modal-id_employee1').value = id_employee;
+        document.getElementById('modal-id_assortment1').value = id_assortment;
+        document.getElementById('modal-price').value = price;
+        document.getElementById('modal-id_prese').value = id_prese;
+        document.getElementById('modal_select').classList.add('active'); // Показываем модальное окно
+    }
+
+    // Функция для закрытия окна
+    function closeModal_select() {
+        document.getElementById('modal_select').classList.remove('active'); // Скрываем модальное окно
+    }
+    // Функция для открытия окна и передачи ID ассортимента
+    function openModal_into(){
+        document.getElementById('modal_into').classList.add('active')
+    }
+    function closeModal_into(){
+        document.getElementById('modal_into').classList.remove('active')
+    }
+</script>
+
+<div id="modal_into" class="modal-overlay">
+    <div class="modal-content">
+        <h1>Введите данные чтобы добавить запись</h1>
+        <form method="post" action="/order_work">
+            <div>
+                <label for="count1">Количество товара:</label>
+                <input type="text" id="count1" name="count" placeholder="Количество товара">
+            </div>
+            <div>
+                <label for="status1">Статус заказа:</label>
+                <!--<input type="text" id="status" name="status" placeholder="Дата окончание работы">-->
+                <select id="status1" name="status">
+                    <option name="не выбрано">Не выбрано</option>
+                    <option name="ready">ready</option>
+                    <option name="working">working</option>
+                    <option name="not ready">not ready</option>
+                </select>
+            </div>
+            <div>
+                <label for="id_order1">Id заказ:</label>
+                <input type="text" id="id_order1" name="id_order" placeholder="Id заказ">
+            </div>
+            <div>
+                <label for="id_work1">Id работы:</label>
+                <input type="text" id="id_work1" name="id_work" placeholder="Id работы">
+            </div>
+            <div>
+                <label for="id_equipment1">Id обоорудования:</label>
+                <input type="text" id="id_equipment1" name="id_equipment" placeholder="Id обоорудования">
+            </div>
+            <div>
+                <label for="id_employee1">Id работника:</label>
+                <input type="text" id="id_employee1" name="id_employee" placeholder="Id работника">
+            </div>
+            <div>
+                <label for="id_assortment1">Id ассортимента:</label>
+                <input type="text" id="id_assortment1" name="id_assortment" placeholder="Id ассортимента">
+            </div>
+            <div>
+                <label for="price1">Цена товара:</label>
+                <input type="text" id="price1" name="price" placeholder="Цена товара">
+            </div>
+            <div>
+                <label for="id_price1">Id цены товара:</label>
+                <input type="text" id="id_price1" name="id_price" placeholder="Id цены товара">
+            </div>
+            <button class="close-button" type="submit" name="action" value="into">Добавить</button>
+            <button type="button" onclick="closeModal_into()">Закрыть</button>
+        </form>
+    </div>
+</div>
+<div>
+    <a th:if="${currentPage > 1}" th:href="@{order_work(page=${currentPage - 1})}">Previous</a>
+    <span>Page <span th:text="${currentPage}"></span></span>
+    <a th:href="@{order_work(page=${currentPage + 1})}">Next</a>
+</div>
+</body>
+</html>

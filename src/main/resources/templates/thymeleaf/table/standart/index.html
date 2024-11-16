@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Страничка с выбором таблицы для просмотра</title>
+    <style>
+        /* Контейнер карточек */
+        .card-container {
+            display: flex; /* Включаем flexbox */
+            gap: 16px; /* Отступы между карточками */
+            overflow-x: auto; /* Прокрутка при переполнении */
+            padding: 14px;
+        }
+
+        /* Стили карточек */
+        .card {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            width: 225px; /* Ширина карточки */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0; /* Предотвращает уменьшение ширины карточек при переполнении */
+        }
+        .card img {
+            display: block;          /* Делаем изображение блочным элементом */
+            margin: 0 auto;          /* Центрируем изображение */
+            max-width: 100%;         /* Ограничение ширины до границ карточки */
+            max-height: 150px;       /* Максимальная высота изображения */
+            object-fit: contain;     /* Сохраняем пропорции, подгоняя изображение под контейнер */
+            margin-bottom: 2px;      /* Отступ снизу */
+        }
+        /* Стили для содержимого всплывающего окна */
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Стили для фона всплывающего окна */
+        .modal-overlay {
+            display: none; /* Изначально скрыто */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Показать модальное окно */
+        .modal-overlay.active {
+            display: flex; /* Отображать flex для выравнивания по центру */
+        }
+        input {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            width: 80%; /* Ширина поля ввода */
+            padding: 10px; /* Внутренний отступ */
+            margin-top: 5px; /* Отступ сверху */
+            border: 1px solid #ccc; /* Граница поля ввода */
+            border-radius: 4px; /* Скругление углов */
+        }
+        .modal-content label {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 5px; /* Отступ между текстом метки и полем ввода */
+        }
+        .modal-content button{
+            margin-top: 15px; /* Отступ сверху */
+            width: 46%; /* Ширина кнопки */
+            padding: 10px; /* Внутренний отступ */
+            background-color: #007BFF; /* Цвет кнопки */
+            color: white; /* Цвет текста кнопки */
+            border: none; /* Без границы */
+            border-radius: 4px; /* Скругление углов */
+            cursor: pointer; /* Курсор при наведении */
+
+        }
+    </style>
+</head>
+<button onclick="openModal()" style="float: right" type="button">Вход</button>
+    <body>
+    <form method="post" action="/">
+        <!--Карточа для клиентов-->
+    <div class="card-container">
+        <div class="card">
+            <img src="../../../../static/pictures/client.jpg">
+            <div style="text-align: center">
+                <h2>Таблица клиентов</h2>
+                <p>В таблице представлены все клиенты производства одежды</p>
+                <button type="submit" name="action" value="client">Посмотреть клиентов</button>
+            </div>
+        </div>
+        <!--Карточа для заказов-->
+        <div class="card">
+            <img src="../../../../static/pictures/order.jpg">
+            <div style="text-align: center">
+                <h2>Таблица заказов</h2>
+                <p>В таблице представлены все заказы производства одежды</p>
+                <button type="submit" name="action" value="order">Посмотреть заказы</button>
+            </div>
+        </div>
+        <!--Карточа для работы-->
+        <div class="card">
+            <img src="../../../../static/pictures/work1.jpg">
+            <div style="text-align: center">
+                <h2>Таблица работ</h2>
+                <p>В таблице представлены все рвботы производства одежды</p>
+                <button type="submit" name="action" value="work">Посмотреть работы</button>
+            </div>
+        </div>
+        <!--Карточа для оборудования-->
+        <div class="card">
+            <img src="../../../../static/pictures/equipment.jpg">
+            <div style="text-align: center">
+                <h2>Таблица оборудования</h2>
+                <p>В таблице представлены все оборудования производства одежды</p>
+                <button type="submit" name="action" value="equipment">Посмотреть оборудование</button>
+            </div>
+        </div>
+        <!--Карточа для сотрудников-->
+        <div class="card">
+            <img src="../../../../static/pictures/employee.jpg">
+            <div style="text-align: center">
+                <h2>Таблица сотрудников</h2>
+                <p>В таблице представлены все сотрудники производства одежды</p>
+                <button type="submit" name="action" value="employee">Посмотреть сотрудников</button>
+            </div>
+        </div>
+    </div>
+        <div class="card-container">
+        <!--Карточа для сводной таблици работа_заказы-->
+        <div class="card">
+            <img src="../../../../static/pictures/orde_work.jpg">
+            <div style="text-align: center">
+                <h2>Таблица работы_заказы</h2>
+                <p>В таблице представлены все работы_заказы производства одежды</p>
+                <button type="submit" name="action" value="order_work">Посмотреть работы_заказы</button>
+            </div>
+        </div>
+        <!--Карточа для ассортимента-->
+        <div class="card">
+            <img src="../../../../static/pictures/assortment1.png">
+            <div style="text-align: center">
+                <h2>Таблица ассортимента</h2>
+                <p>В таблице представлены весь ассортимент производства одежды</p>
+                <button type="submit" name="action" value="assortment">Посмотреть ассортимент</button>
+            </div>
+        </div>
+    </div>
+            <!--<button type="submit" name="action" value="client">Посмотреть клиентов</button>
+            <button type="submit" name="action" value="order">Посмотреть заказы</button>
+            <button type="submit" name="action" value="work">Посмотреть работы</button>
+            <button type="submit" name="action" value="equipment">Посмотреть оборудование</button>
+            <button type="submit" name="action" value="employee">Посмотреть работников</button>
+            <button type="submit" name="action" value="order_work">Посмотреть заказ_работы</button>
+            <button type="submit" name="action" value="assortment">Посмотреть ассортимент</button>-->
+        </form>
+    <!-- Единственное модальное окно вне цикла -->
+    <div id="modal" class="modal-overlay">
+        <div class="modal-content">
+            <form method="post" action="/regestr">
+            <h1>Авторизация</h1>
+            <div>
+                <label for="name">Логин:</label>
+                <input type="text" id="name" name="name" placeholder="Логин">
+            </div>
+            <div>
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" placeholder="Пароль">
+            </div>
+            <!--<div>
+                <label for="password1">Пароля:</label>
+                <input type="text" id="password1" name="password1" placeholder="Повтор пароля">
+            </div>-->
+            <button class="close-button" type="submit" name="action" value="input">Войти</button>
+            <button class="close-button" type="submit" name="action" value="regestr">Зарегестрироваться</button>
+            <button type="button" onclick="closeModal()">Закрыть</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function openModal(){
+            document.getElementById('modal').classList.add('active')
+        }
+        function closeModal(){
+            document.getElementById('modal').classList.remove('active')
+        }
+    </script>
+    </body>
+</html>
